@@ -4,6 +4,7 @@ typedef struct _SERVICE_HANDLER_PARAMS {
     HANDLE hMonitorStopEvent;
     HANDLE hACDisconnectedEvent;
     HANDLE hWiredEthernetDisconnectedEvent;
+    HANDLE hUsbDeviceConnectedEvent;
     BOOL bMachineSuspended;
     volatile LONG MonitorsCompleted;
 } SERVICE_HANDLER_PARAMS, *PSERVICE_HANDLER_PARAMS;

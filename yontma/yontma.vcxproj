@@ -29,19 +29,23 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -147,6 +151,7 @@
     <ClCompile Include="BdeCheck.cpp" />
     <ClCompile Include="Installer.cpp" />
     <ClCompile Include="PowerMonitor.cpp" />
+    <ClCompile Include="USBDeviceMonitor.cpp" />
     <ClCompile Include="UserManager.cpp" />
     <ClCompile Include="WiredEthernetMonitor.cpp" />
     <ClCompile Include="yontma.cpp" />
@@ -164,6 +169,7 @@
     <ClInclude Include="BdeCheck.h" />
     <ClInclude Include="Installer.h" />
     <ClInclude Include="PowerMonitor.h" />
+    <ClInclude Include="USBDeviceMonitor.h" />
     <ClInclude Include="UserManager.h" />
     <ClInclude Include="WiredEthernetMonitor.h" />
     <ClInclude Include="yontma.h" />
@@ -184,6 +190,8 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling messages...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).rc;%(Filename).h;MSG0409.bin</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).rc;%(Filename).h;MSG0409.bin</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mc.exe -A "%(FullPath)" -h .</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h;%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

@@ -24,9 +24,10 @@ void __stdcall ServiceMain(int argc, TCHAR* argv[])
     HRESULT hr;
     static const int DisconnectACEventIndex = 0;
     static const int DisconnectWiredEthernetEventIndex = 1;
-    static const int ServiceEndEventIndex = 2;
+    static const int ConnectUsbDeviceEventIndex = 2;
+    static const int ServiceEndEventIndex = 3;
     static const int TotalEvents = ServiceEndEventIndex + 1;
-    static const int MonitorCount = 2;
+    static const int MonitorCount = 3;
     HANDLE HandleArray[TotalEvents];
     SERVICE_HANDLER_PARAMS serviceHandlerParams = {0};
     BOOL bExitService = FALSE;
@@ -62,8 +63,12 @@ void __stdcall ServiceMain(int argc, TCHAR* argv[])
                                                                  TRUE,
                                                                  FALSE,
                                                                  NULL);
+    HandleArray[ConnectUsbDeviceEventIndex] = CreateEvent(NULL,
+                                                          TRUE,
+                                                          FALSE,
+                                                          NULL);
 
-    if((!HandleArray[DisconnectACEventIndex]) || (!HandleArray[DisconnectWiredEthernetEventIndex])) {
+    if((!HandleArray[DisconnectACEventIndex]) || (!HandleArray[DisconnectWiredEthernetEventIndex]) || (!HandleArray[ConnectUsbDeviceEventIndex])) {
         bExitService = TRUE;
     }
 
@@ -74,6 +79,7 @@ void __stdcall ServiceMain(int argc, TCHAR* argv[])
                                                          NULL);
     serviceHandlerParams.hACDisconnectedEvent = HandleArray[DisconnectACEventIndex];
     serviceHandlerParams.hWiredEthernetDisconnectedEvent = HandleArray[DisconnectWiredEthernetEventIndex];
+    serviceHandlerParams.hUsbDeviceConnectedEvent = HandleArray[ConnectUsbDeviceEventIndex];
 
     hr = RunYontmaService(&serviceHandlerParams);
     if(HB_FAILED(hr)) {
@@ -104,6 +110,11 @@ void __stdcall ServiceMain(int argc, TCHAR* argv[])
                 HibernateMachine();
                 ResetMonitoringState(MonitorCount, HandleArray, &serviceHandlerParams.MonitorsCompleted);
                 break;
+            case WAIT_OBJECT_0 + ConnectUsbDeviceEventIndex: //USB device was connected
+                WriteLineToLog("ServiceMain: USB Device connected -> suspend");
+                HibernateMachine();
+                ResetMonitoringState(MonitorCount, HandleArray, &serviceHandlerParams.MonitorsCompleted);
+                break;
             case WAIT_OBJECT_0 + ServiceEndEventIndex:
                 WriteLineToLog("ServiceMain: Service stopped");
                 bExitService = TRUE;
@@ -130,6 +141,7 @@ DWORD WINAPI ServiceHandlerEx(DWORD dwControl,
     PSERVICE_HANDLER_PARAMS pServiceHandlerParams = (PSERVICE_HANDLER_PARAMS)lpContext;
     PMONITOR_THREAD_PARAMS pACThreadParams;
     PMONITOR_THREAD_PARAMS pEthernetThreadParams;
+    PMONITOR_THREAD_PARAMS pUsbDeviceThreadParams;
 
     WriteLineToLog("In ServiceHandlerEx");
 
@@ -174,6 +186,20 @@ DWORD WINAPI ServiceHandlerEx(DWORD dwControl,
                          0,
                          WiredEthernetMonitorThread,
                          pEthernetThreadParams,
+                         0,
+                         NULL);
+
+            pUsbDeviceThreadParams = (PMONITOR_THREAD_PARAMS)malloc(sizeof(MONITOR_THREAD_PARAMS));
+            if(!pUsbDeviceThreadParams) {
+                return NO_ERROR;
+            }
+            pUsbDeviceThreadParams->hMonitorStopEvent = pServiceHandlerParams->hMonitorStopEvent;
+            pUsbDeviceThreadParams->hMonitorEvent = pServiceHandlerParams->hUsbDeviceConnectedEvent;
+            pUsbDeviceThreadParams->pMonitorsCompleted = &pServiceHandlerParams->MonitorsCompleted;
+            CreateThread(NULL,
+                         0,
+                         USBDeviceMonitorThread,
+                         pUsbDeviceThreadParams,
                          0,
                          NULL);
 

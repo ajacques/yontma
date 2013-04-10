@@ -39,6 +39,7 @@
 #include <UserEnv.h>
 #include <strsafe.h>
 #include <intsafe.h>
+#include <dbt.h>
 
 #include "messages.h"
 #include "BdeCheck.h"
@@ -48,6 +49,7 @@
 #include "Installer.h"
 #include "PowerMonitor.h"
 #include "WiredEthernetMonitor.h"
+#include "USBDeviceMonitor.h"
 #include "YontmaService.h"
 #include "yontma.h"
 
