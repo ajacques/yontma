@@ -36,8 +36,8 @@ DWORD WINAPI USBDeviceMonitorThread(LPVOID lpParams)
 
     MSG msg;
     while(1) {
-        GetMessage(&msg, NULL, 0, 0);
-        DispatchMessage(&msg);
+        if (PeekMessage(&msg, NULL, 0, 0, TRUE))
+            DispatchMessage(&msg);
 
         switch (WaitForSingleObject(pMonitorThreadParams->hMonitorStopEvent, DEFAULT_SLEEP_TIME)) {
         case WAIT_OBJECT_0:
