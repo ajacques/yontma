@@ -25,6 +25,11 @@ DWORD WINAPI USBDeviceMonitorThread(LPVOID lpParams)
     }
     
     HWND hWnd = CreateWindowTracker();
+
+    if (hWnd == NULL)
+    {
+        goto cleanexit;
+    }
     
     DEV_BROADCAST_DEVICEINTERFACE deviceInterface;
     ZeroMemory(&deviceInterface, sizeof(DEV_BROADCAST_DEVICEINTERFACE));
@@ -50,6 +55,11 @@ DWORD WINAPI USBDeviceMonitorThread(LPVOID lpParams)
 cleanexit:
     WriteLineToLog("USBDeviceMonitorThread: Exiting");
     InterlockedIncrement(pMonitorThreadParams->pMonitorsCompleted);
+
+    if (hWnd != NULL)
+    {
+        DestroyWindow(hWnd);
+    }
 
     HB_SAFE_FREE(pMonitorThreadParams);
 
